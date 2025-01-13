@@ -5,7 +5,7 @@ local Quaternion = {}
 local toAxisAngle = CFrame.identity.ToAxisAngle
 
 local function normalize(w: number, v: Vector3): (number, Vector3)
-	local magnitude = (w * w + v.X * v.X + v.Y * v.Y + v.Z * v.Z) ^ .5
+	local magnitude = (w * w + vector.dot(v, v)) ^ .5
 	if magnitude == 0 then
 		return 0, Vector3.zero --avoid NaN
 	end
@@ -30,7 +30,7 @@ function Quaternion.toCFrame(w: number, v: Vector3): CFrame
 end
 
 function Quaternion.slerp(w0: number, v0: Vector3, w1: number, v1: Vector3, alpha: number): (number, Vector3)
-	local dot = v0.X * v1.X + v0.Y * v1.Y + v0.Z * v1.Z + w0 * w1
+	local dot = vector.dot(v0, v1) + w0 * w1
 	if dot < 0 then
 		w0 = -w0
 		v0 = -v0
@@ -51,10 +51,7 @@ function Quaternion.slerp(w0: number, v0: Vector3, w1: number, v1: Vector3, alph
 	local s1 = sinTheta / sinTheta0
 	local s0 = math.cos(theta) - dot * s1
 	
-	local w = s0 * w0 + s1 * w1
-	local v = s0 * v0 + s1 * v1
-	
-	return normalize(w, v)
+	return normalize(s0 * w0 + s1 * w1, s0 * v0 + s1 * v1)
 end
 
 --[[
@@ -71,7 +68,7 @@ function Quaternion.average(array: {number & Vector3}): (number, Vector3)
 	end
 	
 	local trials = size / 2
-	return sumw / trials, sumv / trials
+	return normalize(sumw / trials, sumv / trials)
 end
 
 return Quaternion
