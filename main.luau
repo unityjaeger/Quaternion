@@ -27,7 +27,7 @@ end
 --it is assumed that the input quaternion is normalized
 function Quaternion.toCFrame(w: number, v: Vector3): CFrame
 	local angle = 2 * math.acos(w)
-	return CFrame.fromAxisAngle(v.Unit, angle)
+	return CFrame.fromAxisAngle(v, angle)
 end
 
 function Quaternion.slerp(w0: number, v0: Vector3, w1: number, v1: Vector3, alpha: number): (number, Vector3)
